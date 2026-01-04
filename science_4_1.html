@@ -2,858 +2,1603 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>四年级科学闯关大冒险</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>科学探险大冒险</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Arial Rounded MT Bold", "Microsoft YaHei", sans-serif;
         }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
         body {
-            background: linear-gradient(135deg, #7ee8fa 0%, #80ff72 100%);
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            width: 100%;
-            max-width: 800px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            overflow: hidden;
+            justify-content: center;
+            align-items: flex-start; /* 改为flex-start，避免垂直居中导致部分内容被截断 */
+            padding: 10px;
             position: relative;
+            overflow: auto; /* 改为auto，允许滚动 */
         }
-        .screen {
-            padding: 30px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px;
+            padding: 20px; /* 减少内边距 */
             text-align: center;
+            position: relative;
+            z-index: 10;
+            margin-top: 10px; /* 添加顶部边距 */
+            margin-bottom: 10px; /* 添加底部边距 */
+            box-sizing: border-box; /* 确保padding不会增加总宽度 */
+            min-height: auto; /* 改为auto，适应内容高度 */
+            max-height: calc(100vh - 20px); /* 限制最大高度为视口高度减去边距 */
+            overflow-y: auto; /* 允许垂直滚动 */
         }
-        .screen.active {
-            display: flex;
-            animation: fadeIn 0.5s ease;
+
+        .title {
+            color: #2d3436;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
+
+        .subtitle {
+            color: #636e72;
+            font-size: 1.3em;
+            margin-bottom: 30px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 2.2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        
+        /* 移动端适配 */
+        @media screen and (max-width: 768px) {
+            .title {
+                font-size: 2.2em;
+                padding: 5px;
+            }
+            
+            .subtitle {
+                font-size: 1.1em;
+            }
+            
+            .btn {
+                padding: 14px 24px;
+                font-size: 1.1em;
+                margin: 8px;
+            }
+            
+            .question {
+                font-size: 1.4em;
+                margin-bottom: 20px;
+            }
+            
+            .option {
+                padding: 14px;
+                font-size: 1.1em;
+            }
+            
+            .feedback {
+                font-size: 1.2em;
+                padding: 16px;
+            }
+            
+            .score-display {
+                font-size: 1.4em;
+            }
+            
+            .character {
+                font-size: 2.5em;
+            }
+            
+            .game-info {
+                padding: 15px;
+            }
+            
+            .input-answer {
+                padding: 12px;
+                font-size: 1.1em;
+            }
+            
+            .life {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .reward-punishment {
+                font-size: 1.1em;
+                padding: 12px;
+            }
+            
+            .timer {
+                font-size: 1.2em;
+            }
+            
+            .streak {
+                font-size: 1.1em;
+            }
+            
+            .level-indicator {
+                font-size: 1.1em;
+            }
+            
+            .unit-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .unit-btn {
+                padding: 12px 20px;
+                font-size: 1em;
+                min-width: 200px;
+                max-width: 250px;
+            }
         }
-        h2 {
-            color: #3498db;
-            margin: 15px 0;
-            font-size: 1.8rem;
+        
+        @media screen and (max-width: 480px) {
+            .title {
+                font-size: 1.8em;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1em;
+                margin: 6px;
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .question {
+                font-size: 1.2em;
+                line-height: 1.4;
+            }
+            
+            .option {
+                padding: 12px;
+                font-size: 1em;
+                line-height: 1.3;
+            }
+            
+            .game-container {
+                padding: 15px;
+                margin: 5px;
+                max-height: calc(100vh - 10px);
+            }
+            
+            .options {
+                gap: 8px;
+            }
+            
+            .character {
+                font-size: 2em;
+            }
+            
+            .progress {
+                height: 20px;
+            }
+            
+            .feedback {
+                font-size: 1.1em;
+                padding: 12px;
+                margin: 15px 0;
+            }
+            
+            .score-display {
+                font-size: 1.3em;
+                margin: 15px 0;
+            }
+            
+            .unit-btn {
+                min-width: 150px;
+                max-width: 220px;
+                padding: 10px 15px;
+            }
         }
-        h3 {
-            color: #e67e22;
-            margin: 10px 0;
-            font-size: 1.4rem;
-        }
+
         .btn {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            background: linear-gradient(45deg, #00b894, #00cec9);
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-size: 1.1rem;
+            padding: 16px 32px;
+            font-size: 1.3em;
+            border-radius: 50px;
             cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(52,152,219,0.3);
+            margin: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
         }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(52,152,219,0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
+
         .btn:active {
-            transform: translateY(1px);
+            transform: translateY(0);
         }
-        .btn.warning {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+
+        .btn-wrong {
+            background: linear-gradient(45deg, #d63031, #e17055);
         }
-        .btn.success {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+
+        .btn-wrong:hover {
+            background: linear-gradient(45deg, #cd2e2e, #d63031);
         }
-        .level-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px 0;
+
+        .btn-correct {
+            background: linear-gradient(45deg, #00b894, #55efc4);
         }
-        .level-btn {
-            width: 120px;
-            height: 120px;
-            margin: 15px;
-            border-radius: 20px;
-            background: white;
-            border: 3px solid #3498db;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+
+        .btn-correct:hover {
+            background: linear-gradient(45deg, #00a085, #00b894);
         }
-        .level-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(52,152,219,0.2);
+
+        .question-container {
+            margin: 25px 0;
+            position: relative;
         }
-        .level-btn img {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 10px;
+
+        .question {
+            font-size: 1.6em;
+            color: #2d3436;
+            margin-bottom: 25px;
+            font-weight: bold;
+            line-height: 1.5;
         }
-        .question-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
-            width: 100%;
-            margin: 20px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
+
         .options {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 20px;
+            margin-bottom: 25px;
         }
+
         .option {
-            background: white;
-            border: 2px solid #bdc3c7;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: left;
+            padding: 18px;
+            background: linear-gradient(145deg, #f7f7f7, #ffffff);
+            border: 2px solid #ddd;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 1.05rem;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 1.2em;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
+
         .option:hover {
-            border-color: #3498db;
-            background: #f1f9ff;
+            background: linear-gradient(145deg, #eaf2f8, #f7f7f7);
+            border-color: #74b9ff;
+            transform: translateX(5px);
         }
-        .option.correct {
-            background: #e8f5e9;
-            border-color: #2ecc71;
+
+        .option.selected {
+            background: linear-gradient(145deg, #74b9ff, #0984e3);
+            color: white;
+            border-color: #0984e3;
+            transform: scale(1.02);
         }
-        .option.incorrect {
-            background: #ffebee;
-            border-color: #e74c3c;
-        }
+
         .feedback {
+            font-size: 1.4em;
+            margin: 25px 0;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        .correct {
+            background: linear-gradient(145deg, #d1f2eb, #a3e4d7);
+            color: #27ae60;
+            border: 3px solid #58d68d;
+        }
+
+        .wrong {
+            background: linear-gradient(145deg, #fadbd8, #f5b7b1);
+            color: #c0392b;
+            border: 3px solid #e74c3c;
+        }
+
+        .score-display {
+            font-size: 1.6em;
+            color: #2d3436;
+            margin: 25px 0;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .progress {
+            width: 100%;
+            background: #ecf0f1;
+            border-radius: 15px;
+            height: 25px;
+            margin: 25px 0;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            width: 0%;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                -45deg,
+                rgba(255,255,255,0.2) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255,255,255,0.2) 50%,
+                rgba(255,255,255,0.2) 75%,
+                transparent 75%
+            );
+            background-size: 30px 30px;
+            animation: move 2s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes move {
+            0% {background-position: 0 0;}
+            100% {background-position: 30px 30px;}
+        }
+
+        .game-info {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: left;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .input-answer {
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 350px;
+            margin: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .life-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin: 20px 0;
+        }
+
+        .life {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8787);
+            margin: 0 5px;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .life.lost {
+            background: #ddd;
+            opacity: 0.3;
+        }
+
+        .reward-punishment {
+            font-size: 1.3em;
+            margin: 15px 0;
             padding: 15px;
             border-radius: 10px;
-            font-size: 1.1rem;
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
             display: none;
         }
-        .feedback.correct {
-            background: #e8f5e9;
-            color: #27ae60;
-            display: block;
+
+        .character {
+            font-size: 3em;
+            margin: 20px 0;
+            transition: all 0.3s;
         }
-        .feedback.incorrect {
-            background: #ffebee;
-            color: #c0392b;
-            display: block;
+
+        .character.correct {
+            transform: scale(1.2) rotate(10deg);
+            color: #00b894;
         }
-        .score-panel {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.8);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            color: #2c3e50;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+        .character.wrong {
+            transform: scale(0.8) rotate(-10deg);
+            color: #d63031;
         }
-        .sort-container {
-            display: flex;
-            justify-content: space-between;
-            margin: 30px 0;
-            width: 100%;
+
+        .level-indicator {
+            font-size: 1.2em;
+            color: #636e72;
+            margin-bottom: 15px;
         }
-        .sort-source, .sort-target {
-            width: 45%;
-            min-height: 200px;
-            border: 2px dashed #3498db;
-            border-radius: 10px;
-            padding: 15px;
+
+        .unit-selector {
+            margin: 25px 0;
         }
-        .sort-item {
-            background: #3498db;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 8px 0;
-            cursor: grab;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        .sort-item:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
-        .experiment-container {
+        
+        .unit-buttons-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
+            gap: 10px;
+            margin-top: 10px;
         }
-        .experiment-item {
-            background: white;
-            border: 2px solid #e67e22;
+
+        .unit-btn {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1em;
             border-radius: 10px;
-            padding: 15px;
-            width: 150px;
-            text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            flex: 1;
+            min-width: 120px;
+            max-width: 180px;
+            text-align: center;
         }
-        .experiment-item.active {
-            background: #f39c12;
-            color: white;
-            border-color: #d35400;
+
+        .unit-btn:hover {
+            background: linear-gradient(45deg, #5f4bd1, #8c7ae6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
-        .progress-container {
-            width: 100%;
-            height: 15px;
-            background: #ecf0f1;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
+
+        .unit-btn.active {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
         }
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #3498db 0%, #2ecc71 100%);
-            width: 0%;
-            transition: width 0.5s ease;
+
+        .background-element {
+            position: absolute;
+            font-size: 2em;
+            opacity: 0.1;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite;
         }
-        .result-panel {
-            background: linear-gradient(135deg, #fef7fb 0%, #fcf1f7 100%);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 20px 0;
-            width: 100%;
+
+        .bg-1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .bg-2 { top: 20%; right: 10%; animation-delay: 1s; }
+        .bg-3 { bottom: 15%; left: 15%; animation-delay: 2s; }
+        .bg-4 { bottom: 25%; right: 20%; animation-delay: 3s; }
+        .bg-5 { top: 40%; left: 25%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
         }
-        .medal {
-            width: 120px;
-            height: 120px;
-            margin: 20px auto;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: white;
-            box-shadow: 0 4px 15px rgba(241,196,15,0.4);
-        }
-        .knowledge-tip {
-            background: #e3f2fd;
-            border-left: 4px solid #3498db;
-            padding: 15px;
+
+        .timer {
+            font-size: 1.4em;
+            color: #2d3436;
             margin: 15px 0;
-            border-radius: 0 8px 8px 0;
-            text-align: left;
-            font-size: 1rem;
-            color: #2c3e50;
+            font-weight: bold;
         }
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            h2 {
-                font-size: 1.5rem;
-            }
-            .level-btn {
-                width: 100px;
-                height: 100px;
-                margin: 10px;
-            }
-            .sort-container {
-                flex-direction: column;
-                gap: 20px;
-            }
-            .sort-source, .sort-target {
-                width: 100%;
-            }
+
+        .streak {
+            font-size: 1.2em;
+            color: #00b894;
+            margin: 10px 0;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 开始界面 -->
-        <div id="start-screen" class="screen active">
-            <h1>科学知识闯关大冒险</h1>
-            <p style="font-size: 1.1rem; color: #34495e; margin: 20px 0;">
-                欢迎来到四年级科学闯关！<br>
-                挑战三个单元，赢取"科学小达人"勋章！
-            </p>
-            <div style="margin: 30px 0;">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjMzQ5OGRiIiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTEgOCAyNTYgOHptMCA0MzZjLTExMC41IDAtMjAwLTg5LjUtMjAwLTIwMFMxNDUuNSA1NiAyNTYgNTZzMjAwIDg5LjUgMjAwIDIwMC04OS41IDIwMC0yMDAgMjAwem0tOTYtMzE2YzAtMTcuNyAxNC4zLTMyIDMyLTMyczMyIDE0LjMgMzIgMzJ2MTI4YyAgMCAxNy43LTE0LjMgMzItMzJzMzItMzIgMzIgMzJ2LTEyOGMwLTE3LjctMTQuMy0zMi0zMi0zMnoiLz48cGF0aCBmaWxsPSIjZTZlNzUyIiBkPSJNMzUyIDEyOGMwLTE3LjcgMTQuMy0zMiAzMi0zMnoiLz48cGF0aCBmaWxsPSIjMmVjYzcxIiBkPSJNMjU2IDI1NmMtMTcuNyAwLTMyLTE0LjMtMzItMzJzMTQuMy0zMiAzMi0zMmMxNy43IDAgMzIgMTQuMyAzMiAzMnptMCAxMjhjLTE3LjcgMC0zMi0xNC4zLTMyLTMyczE0LjMtMzIgMzItMzJjMTcuNyAwIDMyIDE0LjMgMzIgMzJ6Ii8+PHBhdGggZmlsbD0iI2QzNTQwMCIgZD0iTTM1MiAzODRjMC0xNy43LTE0LjMtMzItMzItMzJzLTMyIDE0LjMtMzIgMzJ2LTY0YzAtMTcuNyAxNC4zLTMyIDMyLTMyczMyIDE0LjMgMzIgMzJ2NjR6Ii8+PC9zdmc+" alt="科学图标" style="width: 150px; height: 150px;">
+    <!-- 背景装饰元素 -->
+    <div class="background-element bg-1">🔬</div>
+    <div class="background-element bg-2">🔭</div>
+    <div class="background-element bg-3">🧪</div>
+    <div class="background-element bg-4">🧲</div>
+    <div class="background-element bg-5">⚡</div>
+
+    <div class="game-container">
+        <h1 class="title">🚀 科学探险大冒险</h1>
+        <p class="subtitle">探索科学奥秘，成为科学小达人！</p>
+
+        <!-- 欢迎屏幕 -->
+        <div id="welcome-screen" class="screen active">
+            <div class="game-info">
+                <h2>🎮 游戏规则</h2>
+                <p>• 随机挑战科学知识点，答对加分，答错扣生命值</p>
+                <p>• 每题答对得10分，连续答对有额外奖励</p>
+                <p>• 答错会受到小惩罚，但别担心，继续努力！</p>
+                <p>• 拥有3条生命，生命用完游戏结束</p>
+                <p>• 挑战所有科学知识点，成为科学小博士！</p>
             </div>
-            <button class="btn" onclick="goToLevelSelect()">开始闯关</button>
-            <p style="margin-top: 30px; color: #7f8c8d; font-size: 0.9rem;">
-                关卡：声音探秘 → 身体小管家 → 力与运动乐园
-            </p>
+            
+            <div class="unit-selector">
+                <h3>请选择探险领域：</h3>
+                <div class="unit-buttons-container">
+                    <button class="unit-btn active" data-unit="all">全部领域</button>
+                    <button class="unit-btn" data-unit="sound">声音世界</button>
+                    <button class="unit-btn" data-unit="breathing">呼吸消化</button>
+                    <button class="unit-btn" data-unit="motion">运动力场</button>
+                </div>
+            </div>
+            
+            <button id="start-btn" class="btn">开始探险</button>
         </div>
 
-        <!-- 关卡选择界面 -->
-        <div id="level-select-screen" class="screen">
-            <h1>选择闯关关卡</h1>
-            <div class="level-buttons">
-                <div class="level-btn" onclick="startLevel(1)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjM2I5OGQ2IiBkPSJNMzEyIDE0NGgtNjRjLTMuMyAwLTYgMi43LTYgNnYxMjhjMCAzLjMgMi43IDYgNiA2aDg4YzMuMyAwIDYtMi43IDYtNnYtMjRjMC0zLjMtMi43LTYtNi02aC0xNnYtMjRjMC0zLjMgMi43LTYgNi02aDMyYzMuMyAwIDYgMi43IDYgNnYxNDR6Ii8+PHBhdGggZmlsbD0iIzUyZTViMCIgZD0iTTM2OCAyMjR2LTQwYzAtMTMuMy0xMC43LTI0LTI0LTI0cy0yNCAxMC43LTI0IDI0djQwYzAgMTMuMyAxMC43IDI0IDI0IDI0czI0LTEwLjcgMjQtMjR6bS0xNjAgMGwtMjQgMzJjLTMuOSA1LjMtMy45IDEzLjEgMCAxOS4xbDM2IDM2YzUuMyAzLjkgMTMuMSAzLjkgMTkuMSAwbDgwLTgwYzUuMy0zLjkgNS4zLTEzLjEgMC0xOS4xbC0zNi0zNnoiLz48L3N2Zz4=" alt="声音关卡">
-                    <span>声音探秘</span>
-                </div>
-                <div class="level-btn" onclick="startLevel(2)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZTJjYzcxIiBkPSJNMzUyIDE2MGMwLTEzLjMtMTAuNy0yNC0yNC0yNHMtMjQgMTAuNy0yNCAyNHYxOTJjMCAxMy4zIDEwLjcgMjQgMjQgMjRzMjQtMTAuNyAyNC0yNFYxNjB6bS0xNiAyODhjLTYuNiAwLTEyLTUuNC0xMi0xMnYtMTI4YzAtNi42IDUuNC0xMiAxMi0xMmg0OGMwIDYuNi01LjQgMTItMTIgMTJ2MTI4YzAtNi42LTUuNC0xMi0xMi0xMnptLTkwLTY0YzAtMTcuNyAxNC4zLTMyIDMyLTMyczMyIDE0LjMgMzIgMzJ2MTI4YzAgMTcuNy0xNC4zIDMyLTMyIDMycy0zMi0xNC4zLTMyLTMyVjE2MGMwLTE3LjcgMTQuMy0zMiAzMi0zMnoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMjU2IDEyOGMwLTE3LjcgMTQuMy0zMiAzMi0zMnoiLz48L3N2Zz4=" alt="身体关卡">
-                    <span>身体小管家</span>
-                </div>
-                <div class="level-btn" onclick="startLevel(3)">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZTU5YjM0IiBkPSJNMzUyIDM2OGgtMTYwYy0xNy43IDAtMzItMTQuMy0zMi0zMlYxNDRjMC0xNy43IDE0LjMtMzIgMzItMzJzMzIgMTQuMyAzMiAzMnY4MGg0OGMwIDE3LjctMTQuMyAzMi0zMiAzMnptLTEyOC0xMjh2LTQ4YzAtOC44IDcuMi0xNiAxNi0xNnM1Ni0xNiA1NiAxNnY0OGMwIDguOC03LjIgMTYtMTYgMTZzLTU2LTE2LTU2LTE2ek0xNjAgMzUyYzAgOC44IDcuMiAxNiAxNiAxNnM1Ni0xNiA1Ni0xNnYtNDhjMC04LjgtNy4yLTE2LTE2LTE2cy01NiAxNi01NiAxNnY0OHoiLz48L3N2Zz4=" alt="力与运动关卡">
-                    <span>力与运动乐园</span>
-                </div>
+        <!-- 游戏中屏幕 -->
+        <div id="game-screen" class="screen">
+            <div class="level-indicator">第 <span id="level">1</span> 关</div>
+            <div class="timer">时间: <span id="time">60</span>s</div>
+            <div class="streak">连击: <span id="streak">0</span> 连</div>
+            
+            <div class="life-container">
+                <div class="life" id="life1"></div>
+                <div class="life" id="life2"></div>
+                <div class="life" id="life3"></div>
             </div>
-            <button class="btn warning" onclick="goToStart()">返回首页</button>
-        </div>
-
-        <!-- 答题界面 -->
-        <div id="quiz-screen" class="screen">
-            <div class="score-panel">得分：<span id="score">0</span></div>
-            <h2 id="level-title">声音探秘 - 第1题</h2>
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
+            
+            <div class="progress">
+                <div id="progress-bar" class="progress-bar"></div>
             </div>
-            <div class="question-card">
-                <h3 id="question-text">声音是由物体的什么运动产生的？</h3>
-                <div class="options" id="options-container">
-                    <!-- 选项将通过JS动态生成 -->
-                </div>
-            </div>
-            <div class="feedback" id="feedback"></div>
-            <div class="knowledge-tip" id="knowledge-tip" style="display: none;">
-                知识点：声音是由物体振动产生的，振动停止，发声也会停止。
-            </div>
-            <div style="display: flex; justify-content: center; margin-top: 20px;">
-                <button class="btn warning" onclick="goToLevelSelect()">放弃关卡</button>
-                <button class="btn success" id="next-btn" onclick="nextQuestion()" style="display: none;">下一题</button>
-            </div>
-        </div>
-
-        <!-- 消化器官排序关卡 -->
-        <div id="sort-screen" class="screen">
-            <div class="score-panel">得分：<span id="sort-score">0</span></div>
-            <h2>身体小管家 - 消化路线排序</h2>
-            <p style="color: #34495e; margin: 15px 0;">
-                请将食物的消化路线按正确顺序拖拽到右侧方框中
-            </p>
-            <div class="sort-container">
-                <div class="sort-source" id="sort-source">
-                    <div class="sort-item" draggable="true" ondragstart="dragStart(event)">口腔</div>
-                    <div class="sort-item" draggable="true" ondragstart="dragStart(event)">食道</div>
-                    <div class="sort-item" draggable="true" ondragstart="dragStart(event)">胃</div>
-                    <div class="sort-item" draggable="true" ondragstart="dragStart(event)">小肠</div>
-                    <div class="sort-item" draggable="true" ondragstart="dragStart(event)">大肠</div>
-                </div>
-                <div class="sort-target" id="sort-target" ondragover="dragOver(event)" ondrop="drop(event)"></div>
-            </div>
-            <div class="feedback" id="sort-feedback"></div>
-            <div class="knowledge-tip">
-                知识点：食物的旅行路线：口腔 → 食道 → 胃 → 小肠 → 大肠 → 体外，每个器官都有重要作用哦！
-            </div>
-            <div style="display: flex; justify-content: center; margin-top: 20px;">
-                <button class="btn" onclick="checkSort()">检查答案</button>
-                <button class="btn success" id="sort-next-btn" onclick="goToQuiz(2, 4)" style="display: none;">继续闯关</button>
+            <div id="question-counter">第 <span id="current-q">1</span> 题，共 <span id="total-q">20</span> 题</div>
+            
+            <div class="character" id="character">🧪</div>
+            
+            <div id="question-container" class="question-container">
+                <div id="question" class="question">问题会在这里显示</div>
+                <div id="options-container" class="options"></div>
+                <input type="text" id="fill-blank-input" class="input-answer" style="display:none;" placeholder="请输入答案">
+                <div id="feedback" class="feedback"></div>
+                <div id="reward-punishment" class="reward-punishment"></div>
+                <button id="next-btn" class="btn" style="display:none;">下一题</button>
             </div>
         </div>
 
-        <!-- 实验模拟关卡 -->
-        <div id="experiment-screen" class="screen">
-            <div class="score-panel">得分：<span id="exp-score">0</span></div>
-            <h2 id="exp-title">力与运动乐园 - 摩擦力实验</h2>
-            <p style="color: #34495e; margin: 15px 0;">
-                请选择能增大摩擦力的做法（可多选）
-            </p>
-            <div class="experiment-container">
-                <div class="experiment-item" onclick="toggleExperimentItem(this)">轮胎做花纹</div>
-                <div class="experiment-item" onclick="toggleExperimentItem(this)">轴上涂润滑油</div>
-                <div class="experiment-item" onclick="toggleExperimentItem(this)">脚蹬表面做纹路</div>
-                <div class="experiment-item" onclick="toggleExperimentItem(this)">用滚动代替滑动</div>
-                <div class="experiment-item" onclick="toggleExperimentItem(this)">刹车橡皮加粗</div>
+        <!-- 成功屏幕 -->
+        <div id="success-screen" class="screen">
+            <div class="character">🏆</div>
+            <h2>🎉 恭喜通关！</h2>
+            <div class="score-display">你的最终得分：<span id="final-score-success">0</span> 分</div>
+            <div class="score-display">正确率：<span id="accuracy-success">0</span>%</div>
+            <div id="performance-comment-success"></div>
+            <div class="reward-punishment" id="success-reward">
+                <p>🎁 <strong>特殊奖励：</strong>你获得了"科学小博士"称号！</p>
+                <p>🎖️ 额外解锁神秘科学实验视频！</p>
+                <p>🚀 获得下一级探险资格！</p>
             </div>
-            <div class="feedback" id="exp-feedback"></div>
-            <div class="knowledge-tip">
-                知识点：接触面越粗糙、物体越重，摩擦力越大；滚动摩擦力小于滑动摩擦力。
-            </div>
-            <div style="display: flex; justify-content: center; margin-top: 20px;">
-                <button class="btn" onclick="checkExperiment()">提交答案</button>
-                <button class="btn success" id="exp-next-btn" onclick="showResult()" style="display: none;">查看总结果</button>
-            </div>
+            <button id="play-again-success" class="btn">再来一次</button>
         </div>
 
-        <!-- 结果界面 -->
-        <div id="result-screen" class="screen">
-            <h1>闯关完成！</h1>
-            <div class="result-panel">
-                <div class="medal" id="medal">🏆</div>
-                <h2 id="result-title">恭喜你获得"科学小达人"称号！</h2>
-                <p style="font-size: 1.2rem; color: #2c3e50; margin: 20px 0;">
-                    最终得分：<span id="final-score">0</span> 分
-                </p>
-                <div id="level-results">
-                    <!-- 关卡结果将通过JS动态生成 -->
-                </div>
-                <div class="knowledge-tip" style="margin-top: 20px;">
-                    科学小贴士：生活中处处有科学，多观察、多实验，你会发现更多有趣的知识！
-                </div>
+        <!-- 失败屏幕 -->
+        <div id="failure-screen" class="screen">
+            <div class="character">😰</div>
+            <h2>💔 挑战失败</h2>
+            <div class="score-display">最终得分：<span id="final-score-failure">0</span> 分</div>
+            <div class="score-display">正确率：<span id="accuracy-failure">0</span>%</div>
+            <div id="performance-comment-failure"></div>
+            <div class="reward-punishment" id="failure-punishment">
+                <p>😅 <strong>小惩罚：</strong>需要重新学习科学知识哦！</p>
+                <p>📚 建议复习错题，下次会更好！</p>
+                <p>💪 不要气馁，科学探险需要坚持！</p>
             </div>
-            <button class="btn" onclick="restartGame()">重新闯关</button>
-            <button class="btn" onclick="goToStart()">返回首页</button>
+            <button id="play-again-failure" class="btn">重新挑战</button>
         </div>
     </div>
 
     <script>
-        // 全局变量
-        let currentLevel = 0;
-        let currentQuestion = 0;
-        let totalScore = 0;
-        let levelScores = {1: 0, 2: 0, 3: 0};
-        
-        // 题目数据库
+        // 基于science_4_1.txt内容的科学知识题目库
         const questions = {
-            1: [// 声音单元题目
+            sound: [
                 {
-                    text: "声音是由物体的什么运动产生的？",
-                    options: ["移动", "振动", "旋转", "摆动"],
-                    answer: 1,
-                    tip: "知识点：声音是由物体振动产生的，振动停止，发声也会停止。比如拨动钢尺、击鼓都会产生振动。"
+                    type: "multiple-choice",
+                    question: "声音有哪几种基本特性？",
+                    options: ["A. 高、低", "B. 强、弱", "C. 高、低、强、弱", "D. 只有高低"],
+                    correct: 2,
+                    explanation: "声音有高、低、强、弱之分。"
                 },
                 {
-                    text: "往装有不同水量的玻璃杯中敲击，水多的杯子声音会？",
-                    options: ["更高", "更低", "不变", "时高时低"],
-                    answer: 1,
-                    tip: "知识点：物体振动越快，音高越高。水越多，杯子振动越慢，所以声音越低。"
+                    type: "multiple-choice",
+                    question: "声音是如何产生的？",
+                    options: ["A. 物体的移动", "B. 物体的振动", "C. 物体的加热", "D. 物体的冷却"],
+                    correct: 1,
+                    explanation: "声音是由物体振动产生的。物体受到外力作用并振动时，就会产生声音。如果停止振动发声就会马上停止。"
                 },
                 {
-                    text: "月球上两个人能直接对话吗？为什么？",
-                    options: [
-                        "能，因为距离近",
-                        "不能，因为没有空气",
-                        "能，因为声音能在真空中传播",
-                        "不能，因为月球温度太低"
-                    ],
-                    answer: 1,
-                    tip: "知识点：声音的传播需要介质，空气是重要的传播物质。月球上是真空环境，没有传播声音的介质，所以不能直接对话。"
+                    type: "multiple-choice",
+                    question: "我们的喉咙里有什么器官可以发出声音？",
+                    options: ["A. 气管", "B. 声带", "C. 鼻腔", "D. 口腔"],
+                    correct: 1,
+                    explanation: "我们的喉咙里有一个能够发出声音、控制声音的器官——声带。发声时，声带变紧，快速振动，声带越紧，发出的声音越高。"
                 },
                 {
-                    text: "声音的强弱（音量）是由什么决定的？",
-                    options: ["振动快慢", "振动幅度", "物体大小", "物体颜色"],
-                    answer: 1,
-                    tip: "知识点：振动幅度越大，声音越强；振动幅度越小，声音越弱。比如轻轻敲鼓和用力敲鼓，声音强弱不同。"
+                    type: "multiple-choice",
+                    question: "声音是以什么形式传播的？",
+                    options: ["A. 直线传播", "B. 波的形式传播", "C. 粒子传播", "D. 不传播"],
+                    correct: 1,
+                    explanation: "声音以波的形式传播，当声波遇到物体时，会使物体产生振动。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "声音在什么环境中不能传播？",
+                    options: ["A. 固体中", "B. 液体中", "C. 气体中", "D. 真空中"],
+                    correct: 3,
+                    explanation: "声音需要介质传播，在真空的环境中不能传播声音，比如在月球上，由于没有空气，两个人即使相隔不远也听不到到声音、不能互相通话，必须要使用无线电设备。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "声音在不同介质中传播速度的顺序是什么？",
+                    options: ["A. 气体>液体>固体", "B. 液体>固体>气体", "C. 固体>液体>气体", "D. 气体>固体>液体"],
+                    correct: 2,
+                    explanation: "声音在固体、液体、气体的传播速度是：固体>液体>气体。"
+                },
+                {
+                    type: "fill-blank",
+                    question: "人的外耳由______和外耳道构成。",
+                    correct: "耳廓",
+                    explanation: "人的外耳就像一个隧道，声音通过这个隧道到达鼓膜。耳廓的作用是收集声波。"
+                },
+                {
+                    type: "fill-blank",
+                    question: "声音的强弱可以用______来描述，是由物体振动的幅度决定的。",
+                    correct: "音量",
+                    explanation: "声音的强弱可以用音量来描述。振动幅度越大，声音越强；振动幅度越小，声音越弱。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "声音的高低是由什么决定的？",
+                    options: ["A. 振动的幅度", "B. 振动的快慢", "C. 声音的大小", "D. 声音的时间"],
+                    correct: 1,
+                    explanation: "声音的高低可以用音高来描述，是由物体振动的快慢决定的。振动越快，发出的声音就越高；振动越慢，发出的声音就越低。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "在拨动钢尺时，尺子伸出桌面越短，发出的声音会怎样？",
+                    options: ["A. 越低", "B. 越高", "C. 不变", "D. 先高后低"],
+                    correct: 1,
+                    explanation: "尺子伸出桌面越短，振动越快，发出的声音越高；尺子伸出桌面越长，振动越慢，发出的声音越低。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "琴弦越细，声音会怎样？",
+                    options: ["A. 越低", "B. 越高", "C. 不变", "D. 先高后低"],
+                    correct: 1,
+                    explanation: "拨动琴弦时，琴弦越细，声音越高；琴弦越粗，声音越低。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "橡皮筋越紧，声音会怎样？",
+                    options: ["A. 越低", "B. 越高", "C. 不变", "D. 先高后低"],
+                    correct: 1,
+                    explanation: "拨动橡皮筋时，皮筋越紧，声音越高；皮筋越松，声音越低。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "用击打过的音叉轻轻接触水面，水面会产生什么现象？",
+                    options: ["A. 水面变色", "B. 产生波纹", "C. 水面结冰", "D. 水面消失"],
+                    correct: 1,
+                    explanation: "用击打过的音叉轻轻接触水面，水面会产生波纹，这说明音叉振动了。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "声音在空气中的传播速度是多少？",
+                    options: ["A. 300米/秒", "B. 340米/秒", "C. 400米/秒", "D. 500米/秒"],
+                    correct: 1,
+                    explanation: "声音在空气中的传播速度为340米/秒。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "外耳由哪两部分构成？",
+                    options: ["A. 鼓膜和听小骨", "B. 耳廓和外耳道", "C. 耳廓和鼓膜", "D. 外耳道和听小骨"],
+                    correct: 1,
+                    explanation: "外耳由耳廓和外耳道构成。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "中耳由哪两部分构成？",
+                    options: ["A. 耳廓和外耳道", "B. 鼓膜和听小骨", "C. 耳蜗和听觉神经", "D. 鼓膜和耳蜗"],
+                    correct: 1,
+                    explanation: "中耳由鼓膜和听小骨构成。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "内耳由哪部分组成？",
+                    options: ["A. 鼓膜", "B. 听小骨", "C. 耳蜗", "D. 外耳道"],
+                    correct: 2,
+                    explanation: "内耳由耳蜗组成，耳蜗与听觉神经相连。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "耳廓的主要作用是什么？",
+                    options: ["A. 将声波转化为振动", "B. 将振动转化为信号", "C. 收集声波", "D. 产生振动"],
+                    correct: 2,
+                    explanation: "耳廓的作用是收集声波。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "鼓膜的主要作用是什么？",
+                    options: ["A. 收集声波", "B. 将声波转化为振动", "C. 将振动转化为信号", "D. 产生振动"],
+                    correct: 1,
+                    explanation: "鼓膜的作用是将声波转化为振动。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "耳蜗的主要作用是什么？",
+                    options: ["A. 收集声波", "B. 将声波转化为振动", "C. 将振动转化为信号", "D. 产生振动"],
+                    correct: 2,
+                    explanation: "耳蜗的作用是将振动转化为信号。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "用不同力度敲打音叉，轻轻敲击发出的声音如何？",
+                    options: ["A. 强", "B. 弱", "C. 高", "D. 低"],
+                    correct: 1,
+                    explanation: "用不同力度敲打音叉，轻轻敲击发出的声音弱，大力一点敲击发出的声音强。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "敲击大小不同的两支音叉，小音叉发出的声音如何？",
+                    options: ["A. 低", "B. 高", "C. 弱", "D. 强"],
+                    correct: 1,
+                    explanation: "敲击大小不同的两支音叉，小音叉发出的声音高，大音叉发出的声音低。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "击打长短不同钉子时，钉子越短发出的声音如何？",
+                    options: ["A. 越低", "B. 越高", "C. 越弱", "D. 越强"],
+                    correct: 1,
+                    explanation: "击打长短不同钉子时，钉子越短发出的声音越高。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "拨动琴弦时，琴弦越紧，声音如何？",
+                    options: ["A. 越低", "B. 越高", "C. 越弱", "D. 越强"],
+                    correct: 1,
+                    explanation: "拨动琴弦时，琴弦越紧，声音越高，琴弦越松，声音越低。"
+                },
+                {
+                    type: "fill-blank",
+                    question: "敲击水量不同的玻璃杯，水越______声音越高。",
+                    correct: "少",
+                    explanation: "敲击水量不同的玻璃杯，水越少声音越高，水越多声音越低。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "越短、越小、越少、越细的物体振动越快，发出的声音如何？",
+                    options: ["A. 越低", "B. 越高", "C. 越弱", "D. 越强"],
+                    correct: 1,
+                    explanation: "越短、越小、越少、越细的物体振动越快，发出的声音越高。越长、越大、越多、越粗的物体振动越慢，发出的声音越低。"
                 }
             ],
-            2: [// 呼吸和消化单元题目
+            breathing: [
                 {
-                    text: "人体运动后呼吸会加快，原因是？",
-                    options: [
-                        "身体不需要太多氧气",
-                        "需要更多氧气",
-                        "呼吸肌疲劳",
-                        "心脏跳动变慢"
-                    ],
-                    answer: 1,
-                    tip: "知识点：运动时身体消耗的氧气增多，所以呼吸次数会增加，以便吸入更多氧气，排出更多二氧化碳。"
+                    type: "multiple-choice",
+                    question: "人的呼吸器官不包括以下哪个？",
+                    options: ["A. 鼻腔", "B. 肺", "C. 胃", "D. 气管"],
+                    correct: 2,
+                    explanation: "人的呼吸器官有：鼻腔、气管、支气管、肺、横膈膜等。胃是消化器官，不属于呼吸器官。"
                 },
                 {
-                    text: "下列哪种食物富含蛋白质？",
-                    options: ["肥肉", "米饭", "鸡蛋", "黄瓜"],
-                    answer: 2,
-                    tip: "知识点：蛋白质是构成人体肌肉、内脏等的主要成分，支持生长发育。鸡蛋、牛奶、鱼肉、大豆都富含蛋白质。"
+                    type: "multiple-choice",
+                    question: "人体呼吸的实质是什么？",
+                    options: ["A. 吸入氧气，排出氮气", "B. 吸入氧气，排出二氧化碳", "C. 吸入氮气，排出氧气", "D. 吸入二氧化碳，排出氧气"],
+                    correct: 1,
+                    explanation: "人的呼吸实际上是在进行着气体交换，使氧气进入血液，同时排出二氧化碳。"
                 },
                 {
-                    text: "检验食物中是否含有淀粉，我们可以使用？",
-                    options: ["碘酒", "清水", "食用油", "盐水"],
-                    answer: 0,
-                    tip: "知识点：在食物上滴碘酒，如果变蓝色，说明食物中含有淀粉。比如馒头、土豆都含有淀粉。"
+                    type: "multiple-choice",
+                    question: "正常人在平静状态下，每分钟呼吸多少次左右？",
+                    options: ["A. 10次", "B. 20次", "C. 30次", "D. 40次"],
+                    correct: 1,
+                    explanation: "一个正常人在平静状态下，每分钟呼吸20次左右，每分钟心跳80次左右。"
                 },
                 {
-                    text: "下列哪种做法不利于消化健康？",
-                    options: [
-                        "细嚼慢咽",
-                        "不挑食偏食",
-                        "暴饮暴食",
-                        "多吃蔬菜水果"
-                    ],
-                    answer: 2,
-                    tip: "知识点：细嚼慢咽能让牙齿充分磨碎食物，利于消化；不挑食能保证营养均衡；暴饮暴食会加重肠胃负担。"
+                    type: "fill-blank",
+                    question: "人体所需要的营养成分通常分为蛋白质、糖类、脂肪、维生素、无机盐和______。",
+                    correct: "水",
+                    explanation: "食物中的营养成分通常分为蛋白质、糖类、脂肪、维生素、无机盐和水。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "蛋白质的主要作用是什么？",
+                    options: ["A. 提供能量", "B. 调节身体机能", "C. 构成人体肌肉、内脏、头发、指甲和血液", "D. 提供水分"],
+                    correct: 2,
+                    explanation: "蛋白质是构成人体肌肉、内脏、头发、指甲和血液的主要成分，支持生长发育。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "以下哪种食物富含蛋白质？",
+                    options: ["A. 米饭", "B. 白菜", "C. 牛肉", "D. 苹果"],
+                    correct: 2,
+                    explanation: "含有丰富蛋白质的食物有：大豆、牛肉、鱼肉、鸡蛋、纯牛奶、开心果等。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "在食物上滴碘酒是为了检验是否含有什么？",
+                    options: ["A. 蛋白质", "B. 脂肪", "C. 淀粉", "D. 维生素"],
+                    correct: 2,
+                    explanation: "在食物上滴碘酒，是为了检验食物中是否含有淀粉，滴碘酒的地方变为蓝色，说明这种食物含有淀粉。"
+                },
+                {
+                    type: "fill-blank",
+                    question: "人体的消化器官主要包括口腔、食道、胃、______和大肠。",
+                    correct: "小肠",
+                    explanation: "人体的消化器官主要包括口腔、食道、胃、小肠和大肠。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "口腔中用来切割食物的牙齿叫什么？",
+                    options: ["A. 臼齿", "B. 犬齿", "C. 门齿", "D. 智齿"],
+                    correct: 2,
+                    explanation: "牙齿按形状分类，门齿（8个）用来切割食物；臼齿（20个）用来咀嚼食物；犬齿（4个）用来撕碎食物。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "食物在哪个器官被进一步磨碎和分解？",
+                    options: ["A. 口腔", "B. 食道", "C. 胃", "D. 小肠"],
+                    correct: 2,
+                    explanation: "食物被食道运输到胃里，在胃里被进一步磨碎和分解，在小肠里被吸收。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "脂肪和糖类在人体中主要起什么作用？",
+                    options: ["A. 构成身体组织", "B. 调节身体机能", "C. 提供能量", "D. 提供水分"],
+                    correct: 2,
+                    explanation: "脂肪和糖类是人体能量的主要来源，我们身体可以储存大量的脂肪和糖类。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "维生素和矿物质主要有什么作用？",
+                    options: ["A. 提供能量", "B. 构成身体组织", "C. 调节身体机能", "D. 提供水分"],
+                    correct: 2,
+                    explanation: "维生素和矿物质有调节身体机能的作用，它们的各类非常多，是我们保持健康不可缺少的营养。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "如果把食物放在白纸上挤压、滑动，白纸上留下了油渍，说明这种食物含有什么？",
+                    options: ["A. 蛋白质", "B. 淀粉", "C. 脂肪", "D. 维生素"],
+                    correct: 2,
+                    explanation: "如果把食物放在白纸上挤压、滑动，白纸上留下了油渍，说明这种食物含有脂肪。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "想知道食物中是否含有蛋白质、维生素、矿物质等营养素，我们可以采用什么方法？",
+                    options: ["A. 用鼻子闻", "B. 用嘴尝", "C. 看标签或查资料", "D. 用手摸"],
+                    correct: 2,
+                    explanation: "想知道食物中是否含有蛋白质、维生素、矿物质等营养素，我们可以采用看标签或查资料的方法。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "没有一种食物含有人体所需的所有营养成分，所以我们需要做什么？",
+                    options: ["A. 只吃一种食物", "B. 搭配膳食", "C. 不吃食物", "D. 只吃水果"],
+                    correct: 1,
+                    explanation: "没有一种食物含有人体所需的所有营养成分，所以我们需要搭配膳食，保证营养的充足。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "膳食营养搭配原则不包括以下哪项？",
+                    options: ["A. 荤素搭配", "B. 粗细粮搭配", "C. 只吃肉类", "D. 多种搭配"],
+                    correct: 2,
+                    explanation: "膳食营养搭配原则包括：荤素搭配；粗细粮搭配；多种搭配；每日吃适当的新鲜水果和蔬菜等。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "手指脱皮、口腔溃疡时，需要多吃什么类型的食物？",
+                    options: ["A. 富含蛋白质的", "B. 富含维生素的", "C. 富含脂肪的", "D. 富含糖类的"],
+                    correct: 1,
+                    explanation: "手指脱皮、口腔溃疡时，需要多吃富含维生素的食物。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "消化器官可以将食物转变成我们可以吸收的养料和能量，这一过程叫做什么？",
+                    options: ["A. 咀嚼", "B. 吞咽", "C. 消化", "D. 呼吸"],
+                    correct: 2,
+                    explanation: "消化器官可以将食物转变成我们可以吸收的养料和能量，这一过程叫做消化。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "口腔中用来咀嚼食物的牙齿叫什么？",
+                    options: ["A. 门齿", "B. 犬齿", "C. 臼齿", "D. 门齿和犬齿"],
+                    correct: 2,
+                    explanation: "牙齿按形状分类，门齿（8个）用来切割食物；臼齿（20个）用来咀嚼食物；犬齿（4个）用来撕碎食物。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "牙齿按形状分类，犬齿有几个？",
+                    options: ["A. 8个", "B. 20个", "C. 4个", "D. 12个"],
+                    correct: 2,
+                    explanation: "牙齿按形状分类，门齿（8个）、犬齿（4个）、臼齿（20个）。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "牙齿按形状分类，门齿有几个？",
+                    options: ["A. 8个", "B. 20个", "C. 4个", "D. 12个"],
+                    correct: 0,
+                    explanation: "牙齿按形状分类，门齿（8个）、犬齿（4个）、臼齿（20个）。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "牙齿按形状分类，臼齿有几个？",
+                    options: ["A. 8个", "B. 20个", "C. 4个", "D. 12个"],
+                    correct: 1,
+                    explanation: "牙齿按形状分类，门齿（8个）、犬齿（4个）、臼齿（20个）。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "如果牙齿不好，会有什么影响？",
+                    options: ["A. 消化就会受到影响", "B. 没有影响", "C. 只影响美观", "D. 只影响说话"],
+                    correct: 0,
+                    explanation: "如果牙齿不好，消化就会受到影响，还会影响整个身体的运动。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "食物的旅行线路是什么？",
+                    options: ["A. 食道→胃→小肠→大肠", "B. 食物→口腔→食道→胃→小肠→大肠→体外", "C. 胃→食道→口腔", "D. 小肠→胃→食道→口腔"],
+                    correct: 1,
+                    explanation: "食物的旅行线路：食物→口腔→食道→胃→小肠→大肠→体外。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "人体的消化器官主要包括哪些？",
+                    options: ["A. 心脏、血管", "B. 鼻腔、气管", "C. 口腔、食道、胃、小肠、大肠", "D. 骨骼、关节、肌肉"],
+                    correct: 2,
+                    explanation: "人体的消化器官主要包括口腔、食道、胃、小肠和大肠。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "人体按工作类型分类，消化系统包括哪些器官？",
+                    options: ["A. 骨骼、关节、肌肉", "B. 心脏、血管", "C. 鼻腔、气管、支气管、肺", "D. 口腔、食道、胃、小肠、大肠"],
+                    correct: 3,
+                    explanation: "消化系统包括：口腔、食道、胃、小肠、大肠。"
                 }
             ],
-            3: [// 运动和力单元题目
+            motion: [
                 {
-                    text: "苹果从树上掉下来，是因为受到什么力的作用？",
-                    options: ["弹力", "摩擦力", "重力", "反冲力"],
-                    answer: 2,
-                    tip: "知识点：物体都有一个竖直向下的力，这个力就是重力。重力能把地球表面的物体拉向地面。"
+                    type: "multiple-choice",
+                    question: "物体都有一个什么方向的力，这个力就是重力？",
+                    options: ["A. 水平方向", "B. 向上的力", "C. 竖直向下的力", "D. 任意方向"],
+                    correct: 2,
+                    explanation: "物体都有一个竖直向下的力，这个力就是重力。重力能把地球表面的物体拉向地面。"
                 },
                 {
-                    text: "气球放手后会往后飞，利用的是什么力？",
-                    options: ["重力", "反冲力", "摩擦力", "弹力"],
-                    answer: 1,
-                    tip: "知识点：气球里的气体喷出时，会产生一个和喷出方向相反的推力，这个力叫反冲力。喷气式飞机、火箭都利用了反冲力。"
+                    type: "multiple-choice",
+                    question: "气球里的气体喷出时，会产生一个和喷出方向相反的力，这个力叫什么？",
+                    options: ["A. 重力", "B. 摩擦力", "C. 弹力", "D. 反冲力"],
+                    correct: 3,
+                    explanation: "气球里的气体喷出时，会产生一个和喷出方向相反的推力，这个力叫反冲力。喷气式飞机、火箭都是靠喷气发动机产生的反冲力运动的。"
                 },
                 {
-                    text: "弹簧测力计测量力的单位是？",
-                    options: ["克", "千克", "牛顿", "米"],
-                    answer: 2,
-                    tip: "知识点：力的单位是牛顿，简称“牛”，用符号“N”表示。1牛约等于100克的力。"
+                    type: "multiple-choice",
+                    question: "当橡皮筋受到外力作用形状改变时，会产生一个要恢复原来形状的力，这个力叫什么？",
+                    options: ["A. 重力", "B. 摩擦力", "C. 弹力", "D. 反冲力"],
+                    correct: 2,
+                    explanation: "像橡皮筋这样的物体在受到外力作用时，形状很容易改变，在形状改变时，它们会产生一个要恢复原来形状的力，这个力叫弹力。"
                 },
                 {
-                    text: "为了增大摩擦力，我们可以怎么做？",
-                    options: [
-                        "使接触面变光滑",
-                        "减轻物体重量",
-                        "使接触面变粗糙",
-                        "用滚动代替滑动"
-                    ],
-                    answer: 2,
-                    tip: "知识点：物体间接触面越粗糙，摩擦力越大；接触面越光滑，摩擦力越小。比如轮胎做花纹就是为了增大摩擦力。"
+                    type: "fill-blank",
+                    question: "测量力的大小的工具叫______。",
+                    correct: "弹簧测力计",
+                    explanation: "研究运动和力时，往往需要知道力的大小，弹簧测力计就是测量力的大小的一种工具。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "力的单位是什么？",
+                    options: ["A. 千克", "B. 米", "C. 牛顿", "D. 秒"],
+                    correct: 2,
+                    explanation: "力的单位是牛顿，简称'牛'，用符号'N'表示。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "一个物体在另一个物体表面运动时，两个物体接触面发生的是什么？",
+                    options: ["A. 弹力", "B. 重力", "C. 摩擦力", "D. 反冲力"],
+                    correct: 2,
+                    explanation: "一个物体在另一个物体的表面运动时，两个物体的接触面会发生摩擦，运动物体要受到一种阻碍运动的力，这种力叫摩擦力。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "滑动摩擦力与滚动摩擦力的关系是？",
+                    options: ["A. 滑动摩擦力小于滚动摩擦力", "B. 滑动摩擦力等于滚动摩擦力", "C. 滑动摩擦力远远大于滚动摩擦力", "D. 没有固定关系"],
+                    correct: 2,
+                    explanation: "一个物体在另一个物体表面运动，有滑动和滚动两种方式。滑动摩擦力要远远大于滚动摩擦力。"
+                },
+                {
+                    type: "fill-blank",
+                    question: "任何物体工作都需要______，如果没有能量，自然界就不会有运动和变化。",
+                    correct: "能量",
+                    explanation: "任何物体工作都需要能量，如果没有能量，自然界就不会有运动和变化，也不会有生命。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "赛车的轮胎很宽是为了什么？",
+                    options: ["A. 美观", "B. 减小摩擦力", "C. 增大摩擦力，避免打滑", "D. 减轻重量"],
+                    correct: 2,
+                    explanation: "赛车的设计特点之一是轮胎很宽，可以增大摩擦力，避免打滑。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "物体间接触面光滑，摩擦力会怎样？",
+                    options: ["A. 增大", "B. 减小", "C. 不变", "D. 先增大后减小"],
+                    correct: 1,
+                    explanation: "物体间接触面光滑，摩擦力越小；物体间接触面粗糙，摩擦力越大。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "橡皮筋绕的圈数越多，小车会怎样？",
+                    options: ["A. 越慢", "B. 越快，行驶距离越远", "C. 不变", "D. 先快后慢"],
+                    correct: 1,
+                    explanation: "用橡筋作动力的小车，橡皮筋绕的圈数越多，行驶速度越快，行驶距离越远；橡皮筋绕的圈数越少，行驶速度越慢，行驶距离越近。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "1牛约等于多少克的力？",
+                    options: ["A. 50克", "B. 100克", "C. 200克", "D. 500克"],
+                    correct: 1,
+                    explanation: "1牛约等于100克的力。它是以英国著名物理学家牛顿的名字命名的。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "在做小车运动快慢与拉力大小关系实验时，拉力的大小用什么来表示？",
+                    options: ["A. 重量", "B. 体积", "C. 垫圈的个数", "D. 长度"],
+                    correct: 2,
+                    explanation: "在做小车运动快慢与拉力大小关系实验时，拉力的大小用垫圈的个数来表示。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "提供动力可以使小车怎样？",
+                    options: ["A. 静止", "B. 启动", "C. 减速", "D. 停止"],
+                    correct: 1,
+                    explanation: "提供动力可以使小车启动，有阻力使运动的小车静止。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "有阻力使运动的小车怎样？",
+                    options: ["A. 启动", "B. 加速", "C. 静止", "D. 不变"],
+                    correct: 2,
+                    explanation: "提供动力可以使小车启动，有阻力使运动的小车静止。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "充气后的气球具有什么？",
+                    options: ["A. 重力", "B. 摩擦力", "C. 能量", "D. 磁力"],
+                    correct: 2,
+                    explanation: "充气后的气球具有能量，喷气时可以产生动力。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "喷气式飞机、火箭都是靠什么运动的？",
+                    options: ["A. 重力", "B. 摩擦力", "C. 弹力", "D. 喷气发动机产生的反冲力"],
+                    correct: 3,
+                    explanation: "喷气式飞机、火箭都是靠喷气发动机产生的反冲力运动的。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "弹簧测力计是利用弹簧的什么特征制成的？",
+                    options: ["A. 弹簧越长越重", "B. 拉力越大，弹簧伸得越长，示数也越大", "C. 弹簧越粗越硬", "D. 弹簧越细越软"],
+                    correct: 1,
+                    explanation: "弹簧测力计是利用弹簧'拉力越大，弹簧伸得越长，示数也越大'的特征制成的。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "使用弹簧测力计测重力时，读数时应该注意什么？",
+                    options: ["A. 随意读数", "B. 视线与指针相平", "C. 只看刻度", "D. 闭眼读数"],
+                    correct: 1,
+                    explanation: "使用弹簧测力计测重力时应注意：(1)拿起测力计，先检查指针是不是指在'0'位置；(2)读数时，视线与指针相平；(3)测量的力不能超过测力计刻度标出的最大数量。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "我们用测力计沿水平方向拉一个物体，刚好能使这个物体运动起来的力是什么？",
+                    options: ["A. 重力", "B. 弹力", "C. 它受到的摩擦力", "D. 反冲力"],
+                    correct: 2,
+                    explanation: "我们用测力计沿水平方向拉一个物体，刚好能使这个物体运动起来的力就是它受到的摩擦力。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "物体重，运动时摩擦力会怎样？",
+                    options: ["A. 越小", "B. 越大", "C. 不变", "D. 先大后小"],
+                    correct: 1,
+                    explanation: "物体间接触面光滑，摩擦力越小；物体间接触面粗糙，摩擦力越大。物体重，运动时摩擦力越大；物体轻，摩擦力越小。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "物体轻，运动时摩擦力会怎样？",
+                    options: ["A. 越大", "B. 越小", "C. 不变", "D. 先小后大"],
+                    correct: 1,
+                    explanation: "物体间接触面光滑，摩擦力越小；物体间接触面粗糙，摩擦力越大。物体重，运动时摩擦力越大；物体轻，摩擦力越小。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "自行车上需要摩擦力的地方不包括以下哪个？",
+                    options: ["A. 前后轮胎", "B. 脚蹬的表面", "C. 刹车橡皮", "D. 前轴"],
+                    correct: 3,
+                    explanation: "自行车上需要摩擦力的地方：前后轮胎、脚蹬的表面、刹车橡皮、手柄做成花纹；不需要摩擦力的地方：前轴、中轴、后轴、脚蹬的轴、大小齿轮与链条。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "赛车的车身重心很低是为了什么？",
+                    options: ["A. 美观", "B. 减轻重量", "C. 使行驶稳定", "D. 增加速度"],
+                    correct: 2,
+                    explanation: "赛车的设计特点：(1)轮胎很宽，可以增大摩擦力，避免打滑；(2)要设计力量很大的发动机；(3)车身重心很低，轮与轮之间的距离较宽，可以使行驶稳定；(4)设计流线型车身，使阻力减到最低。"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "赛车设计流线型车身是为了什么？",
+                    options: ["A. 美观", "B. 减轻重量", "C. 使阻力减到最低", "D. 增加速度"],
+                    correct: 2,
+                    explanation: "赛车的设计特点：(1)轮胎很宽，可以增大摩擦力，避免打滑；(2)要设计力量很大的发动机；(3)车身重心很低，轮与轮之间的距离较宽，可以使行驶稳定；(4)设计流线型车身，使阻力减到最低。"
                 }
             ]
         };
 
-        // 页面切换函数
-        function goToStart() {
-            document.getElementById("start-screen").classList.add("active");
-            document.getElementById("level-select-screen").classList.remove("active");
-            document.getElementById("quiz-screen").classList.remove("active");
-            document.getElementById("sort-screen").classList.remove("active");
-            document.getElementById("experiment-screen").classList.remove("active");
-            document.getElementById("result-screen").classList.remove("active");
-        }
+        // 游戏状态
+        let currentQuestion = 0;
+        let score = 0;
+        let lives = 3;
+        let selectedAnswer = -1;
+        let selectedUnit = 'all';
+        let currentQuestions = [];
+        let streak = 0; // 连击数
+        let timer; // 计时器
+        let timeLeft = 10; // 每题30秒
+        let level = 1; // 关卡数
 
-        function goToLevelSelect() {
-            document.getElementById("level-select-screen").classList.add("active");
-            document.getElementById("start-screen").classList.remove("active");
-            document.getElementById("quiz-screen").classList.remove("active");
-            document.getElementById("sort-screen").classList.remove("active");
-            document.getElementById("experiment-screen").classList.remove("active");
-            document.getElementById("result-screen").classList.remove("active");
-        }
+        // DOM元素
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const successScreen = document.getElementById('success-screen');
+        const failureScreen = document.getElementById('failure-screen');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const playAgainSuccessBtn = document.getElementById('play-again-success');
+        const playAgainFailureBtn = document.getElementById('play-again-failure');
+        const questionEl = document.getElementById('question');
+        const optionsContainer = document.getElementById('options-container');
+        const fillBlankInput = document.getElementById('fill-blank-input');
+        const feedbackEl = document.getElementById('feedback');
+        const rewardPunishmentEl = document.getElementById('reward-punishment');
+        const currentQEl = document.getElementById('current-q');
+        const totalQEl = document.getElementById('total-q');
+        const progressBar = document.getElementById('progress-bar');
+        const finalScoreSuccessEl = document.getElementById('final-score-success');
+        const finalScoreFailureEl = document.getElementById('final-score-failure');
+        const accuracySuccessEl = document.getElementById('accuracy-success');
+        const accuracyFailureEl = document.getElementById('accuracy-failure');
+        const performanceCommentSuccessEl = document.getElementById('performance-comment-success');
+        const performanceCommentFailureEl = document.getElementById('performance-comment-failure');
+        const unitBtns = document.querySelectorAll('.unit-btn');
+        const lifeElements = [
+            document.getElementById('life1'),
+            document.getElementById('life2'),
+            document.getElementById('life3')
+        ];
+        const characterEl = document.getElementById('character');
+        const timeEl = document.getElementById('time');
+        const streakEl = document.getElementById('streak');
+        const levelEl = document.getElementById('level');
 
-        // 开始关卡
-        function startLevel(level) {
-            currentLevel = level;
-            currentQuestion = 0;
-            
-            // 重置关卡得分
-            levelScores[level] = 0;
-            
-            // 根据关卡类型显示不同界面
-            if (level === 2 && currentQuestion === 3) {
-                // 消化排序关卡
-                document.getElementById("sort-screen").classList.add("active");
-                document.getElementById("sort-score").textContent = levelScores[2];
-                document.getElementById("sort-target").innerHTML = "";
-                document.getElementById("sort-feedback").style.display = "none";
-                document.getElementById("sort-next-btn").style.display = "none";
-            } else if (level === 3 && currentQuestion === 3) {
-                // 实验模拟关卡
-                document.getElementById("experiment-screen").classList.add("active");
-                document.getElementById("exp-title").textContent = "力与运动乐园 - 摩擦力实验";
-                document.getElementById("exp-score").textContent = levelScores[3];
-                document.getElementById("exp-feedback").style.display = "none";
-                document.getElementById("exp-next-btn").style.display = "none";
-                // 重置实验选项
-                const items = document.querySelectorAll(".experiment-item");
-                items.forEach(item => item.classList.remove("active"));
-            } else {
-                // 普通答题关卡
-                loadQuestion();
-                document.getElementById("quiz-screen").classList.add("active");
-                document.getElementById("score").textContent = levelScores[level];
-                updateProgress();
-            }
-            
-            document.getElementById("level-select-screen").classList.remove("active");
-            document.getElementById("result-screen").classList.remove("active");
-        }
-
-        // 加载题目
-        function loadQuestion() {
-            const q = questions[currentLevel][currentQuestion];
-            document.getElementById("level-title").textContent = 
-                (currentLevel === 1 ? "声音探秘" : currentLevel === 2 ? "身体小管家" : "力与运动乐园") + 
-                " - 第" + (currentQuestion + 1) + "题";
-            document.getElementById("question-text").textContent = q.text;
-            document.getElementById("options-container").innerHTML = "";
-            document.getElementById("feedback").style.display = "none";
-            document.getElementById("knowledge-tip").style.display = "none";
-            document.getElementById("next-btn").style.display = "none";
-            
-            q.options.forEach((option, index) => {
-                const optionElement = document.createElement("div");
-                optionElement.className = "option";
-                optionElement.textContent = option;
-                optionElement.onclick = () => selectOption(index, q.answer);
-                document.getElementById("options-container").appendChild(optionElement);
+        // 事件监听器
+        startBtn.addEventListener('click', startGame);
+        nextBtn.addEventListener('click', nextQuestion);
+        playAgainSuccessBtn.addEventListener('click', restartGame);
+        playAgainFailureBtn.addEventListener('click', restartGame);
+        
+        // 单元选择按钮事件
+        unitBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                unitBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedUnit = btn.dataset.unit;
             });
-        }
+        });
 
-        // 选择选项
-        function selectOption(selectedIndex, correctIndex) {
-            const options = document.querySelectorAll(".option");
-            options.forEach((option, index) => {
-                if (index === correctIndex) {
-                    option.classList.add("correct");
-                } else if (index === selectedIndex && index !== correctIndex) {
-                    option.classList.add("incorrect");
+        // 开始游戏
+        function startGame() {
+            // 根据选择的单元准备题目
+            if (selectedUnit === 'all') {
+                // 合并所有单元的题目并随机打乱
+                currentQuestions = [...questions.sound, ...questions.breathing, ...questions.motion];
+                currentQuestions = shuffleArray([...currentQuestions]);
+                // 限制题目数量为20题
+                if (currentQuestions.length > 20) {
+                    currentQuestions = currentQuestions.slice(0, 20);
                 }
-                option.style.pointerEvents = "none"; // 禁用点击
-            });
-            
-            // 显示反馈和知识点
-            const feedback = document.getElementById("feedback");
-            const knowledgeTip = document.getElementById("knowledge-tip");
-            
-            if (selectedIndex === correctIndex) {
-                feedback.textContent = "太棒了！回答正确！";
-                feedback.className = "feedback correct";
-                // 加分
-                levelScores[currentLevel] += 25;
-                document.getElementById("score").textContent = levelScores[currentLevel];
             } else {
-                feedback.textContent = "哎呀，回答错误！正确答案是：" + options[correctIndex].textContent;
-                feedback.className = "feedback incorrect";
+                currentQuestions = [...questions[selectedUnit]];
+                // 如果选择特定单元，随机选择15题（如果该单元题目足够）
+                if (currentQuestions.length > 15) {
+                    currentQuestions = shuffleArray([...currentQuestions]).slice(0, 15);
+                } else {
+                    currentQuestions = shuffleArray([...currentQuestions]);
+                }
             }
             
-            feedback.style.display = "block";
-            knowledgeTip.textContent = questions[currentLevel][currentQuestion].tip;
-            knowledgeTip.style.display = "block";
+            // 重置游戏状态
+            currentQuestion = 0;
+            score = 0;
+            lives = 3;
+            streak = 0;
+            level = 1;
             
-            // 显示下一题按钮
-            document.getElementById("next-btn").style.display = "block";
+            // 更新生命值显示
+            updateLivesDisplay();
+            
+            welcomeScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            
+            // 开始第一题
+            showQuestion();
+        }
+
+        // 数组随机打乱函数
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // 显示问题
+        function showQuestion() {
+            // 重置计时器
+            timeLeft = 30;
+            timeEl.textContent = timeLeft;
+            clearInterval(timer);
+            timer = setInterval(updateTimer, 1000);
+            
+            const q = currentQuestions[currentQuestion];
+            
+            // 更新问题计数和进度条
+            currentQEl.textContent = currentQuestion + 1;
+            totalQEl.textContent = currentQuestions.length;
+            const progressPercent = ((currentQuestion) / currentQuestions.length) * 100;
+            progressBar.style.width = progressPercent + '%';
+            
+            // 更新关卡显示
+            levelEl.textContent = Math.floor(currentQuestion / 5) + 1;
+            
+            // 重置界面元素
+            questionEl.textContent = q.question;
+            optionsContainer.innerHTML = '';
+            fillBlankInput.style.display = 'none';
+            feedbackEl.style.display = 'none';
+            rewardPunishmentEl.style.display = 'none';
+            nextBtn.style.display = 'none';
+            selectedAnswer = -1;
+            
+            // 重置角色
+            characterEl.textContent = '🧪';
+            characterEl.className = 'character';
+            
+            // 根据题目类型显示不同的界面
+            if (q.type === 'multiple-choice') {
+                q.options.forEach((option, index) => {
+                    const optionEl = document.createElement('div');
+                    optionEl.className = 'option';
+                    optionEl.textContent = option;
+                    optionEl.addEventListener('click', () => selectOption(index, optionEl));
+                    optionsContainer.appendChild(optionEl);
+                });
+            } else if (q.type === 'fill-blank') {
+                fillBlankInput.style.display = 'block';
+                fillBlankInput.value = '';
+                fillBlankInput.focus();
+                fillBlankInput.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        checkFillBlankAnswer();
+                    }
+                });
+            }
+        }
+
+        // 更新计时器
+        function updateTimer() {
+            timeLeft--;
+            timeEl.textContent = timeLeft;
+            
+            // 时间不足警告
+            if (timeLeft <= 5) {
+                timeEl.style.color = '#e74c3c';
+                timeEl.style.fontWeight = 'bold';
+            } else {
+                timeEl.style.color = '#2d3436';
+                timeEl.style.fontWeight = 'bold';
+            }
+            
+            // 时间用完则视为答错
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                handleWrongAnswer("时间用完了！下次要快一点哦！");
+            }
+        }
+
+        // 选择选项（选择题）
+        function selectOption(index, element) {
+            // 停止计时器
+            clearInterval(timer);
+            
+            // 移除之前的选择
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // 添加当前选择
+            element.classList.add('selected');
+            selectedAnswer = index;
+            
+            // 检查答案
+            checkAnswer();
+        }
+
+        // 检查填空题答案
+        function checkFillBlankAnswer() {
+            // 停止计时器
+            clearInterval(timer);
+            
+            const userAnswer = fillBlankInput.value.trim();
+            const correctAnswer = currentQuestions[currentQuestion].correct;
+            
+            if (isAnswerCorrect(userAnswer, correctAnswer)) {
+                handleCorrectAnswer();
+            } else {
+                handleWrongAnswer(`正确答案是：${correctAnswer}`);
+            }
+        }
+
+        // 检查答案是否正确（处理多种可能的正确答案）
+        function isAnswerCorrect(userAnswer, correctAnswer) {
+            // 转换为小写进行比较
+            const userLower = userAnswer.toLowerCase();
+            const correctLower = correctAnswer.toLowerCase();
+            
+            // 简单的模糊匹配
+            return userLower === correctLower || 
+                   userLower.includes(correctLower) || 
+                   correctLower.includes(userLower);
+        }
+
+        // 处理正确答案
+        function handleCorrectAnswer() {
+            // 增加分数
+            let points = 10;
+            streak++;
+            
+            // 连击奖励：每连续答对3题，额外奖励5分
+            if (streak % 3 === 0) {
+                points += 5;
+                showReward(`太棒了！${Math.floor(streak/3)} 连击奖励：额外5分！`);
+            } else {
+                showReward(`答对了！获得${points}分！`);
+            }
+            
+            score += points;
+            
+            // 更新连击显示
+            streakEl.textContent = streak;
+            
+            // 显示正确反馈
+            const q = currentQuestions[currentQuestion];
+            feedbackEl.className = 'feedback correct';
+            feedbackEl.textContent = `正确！${q.explanation}`;
+            feedbackEl.style.display = 'block';
+            
+            // 动画效果
+            characterEl.textContent = '🎉';
+            characterEl.className = 'character correct';
+            
+            nextBtn.style.display = 'inline-block';
+        }
+
+        // 处理错误答案
+        function handleWrongAnswer(additionalMessage = '') {
+            // 连击中断
+            streak = 0;
+            streakEl.textContent = streak;
+            
+            // 减少生命值
+            lives--;
+            updateLivesDisplay();
+            
+            // 显示错误反馈
+            const q = currentQuestions[currentQuestion];
+            feedbackEl.className = 'feedback wrong';
+            feedbackEl.textContent = `不对哦！${additionalMessage} 正确答案是：${q.options ? q.options[q.correct] : q.correct}。${q.explanation}`;
+            feedbackEl.style.display = 'block';
+            
+            // 显示惩罚
+            showPunishment();
+            
+            // 动画效果
+            characterEl.textContent = '😰';
+            characterEl.className = 'character wrong';
+            
+            nextBtn.style.display = 'inline-block';
+            
+            // 检查游戏是否结束
+            if (lives <= 0) {
+                setTimeout(endGame, 1500); // 给玩家一点时间查看结果
+            }
+        }
+
+        // 显示奖励信息
+        function showReward(message) {
+            rewardPunishmentEl.className = 'reward-punishment';
+            rewardPunishmentEl.innerHTML = `<p>🎁 <strong>奖励：</strong>${message}</p>`;
+            rewardPunishmentEl.style.display = 'block';
+        }
+
+        // 显示惩罚信息
+        function showPunishment() {
+            rewardPunishmentEl.className = 'reward-punishment';
+            rewardPunishmentEl.innerHTML = `
+                <p>😅 <strong>小惩罚：</strong>生命值-1！</p>
+                <p>📚 记住这个知识点，下次就不会错了！</p>
+            `;
+            rewardPunishmentEl.style.display = 'block';
+        }
+
+        // 更新生命值显示
+        function updateLivesDisplay() {
+            for (let i = 0; i < 3; i++) {
+                if (i < lives) {
+                    lifeElements[i].classList.remove('lost');
+                } else {
+                    lifeElements[i].classList.add('lost');
+                }
+            }
+        }
+
+        // 检查答案（选择题）
+        function checkAnswer() {
+            const q = currentQuestions[currentQuestion];
+            if (selectedAnswer === q.correct) {
+                handleCorrectAnswer();
+            } else {
+                handleWrongAnswer(`正确答案是：${q.options[q.correct]}`);
+            }
         }
 
         // 下一题
         function nextQuestion() {
             currentQuestion++;
             
-            // 检查关卡是否完成
-            if (currentQuestion >= questions[currentLevel].length) {
-                if (currentLevel === 3) {
-                    // 所有关卡完成
-                    showResult();
+            if (currentQuestion < currentQuestions.length && lives > 0) {
+                showQuestion();
+            } else {
+                if (lives > 0) {
+                    // 游戏成功完成
+                    endGameSuccess();
                 } else {
-                    // 进入下一个关卡
-                    startLevel(currentLevel + 1);
-                }
-            } else {
-                // 检查是否是特殊关卡
-                if (currentLevel === 2 && currentQuestion === 3) {
-                    // 消化排序关卡
-                    document.getElementById("quiz-screen").classList.remove("active");
-                    document.getElementById("sort-screen").classList.add("active");
-                    document.getElementById("sort-score").textContent = levelScores[2];
-                    document.getElementById("sort-target").innerHTML = "";
-                    document.getElementById("sort-feedback").style.display = "none";
-                    document.getElementById("sort-next-btn").style.display = "none";
-                } else if (currentLevel === 3 && currentQuestion === 3) {
-                    // 实验模拟关卡
-                    document.getElementById("quiz-screen").classList.remove("active");
-                    document.getElementById("experiment-screen").classList.add("active");
-                    document.getElementById("exp-score").textContent = levelScores[3];
-                    document.getElementById("exp-feedback").style.display = "none";
-                    document.getElementById("exp-next-btn").style.display = "none";
-                    // 重置实验选项
-                    const items = document.querySelectorAll(".experiment-item");
-                    items.forEach(item => item.classList.remove("active"));
-                } else {
-                    // 加载普通题目
-                    loadQuestion();
-                    updateProgress();
+                    // 游戏失败
+                    endGame();
                 }
             }
         }
 
-        // 跳转到指定关卡的指定题目
-        function goToQuiz(level, questionIndex) {
-            currentLevel = level;
-            currentQuestion = questionIndex;
-            loadQuestion();
-            document.getElementById("sort-screen").classList.remove("active");
-            document.getElementById("experiment-screen").classList.remove("active");
-            document.getElementById("quiz-screen").classList.add("active");
-            document.getElementById("score").textContent = levelScores[level];
-            updateProgress();
-        }
-
-        // 更新进度条
-        function updateProgress() {
-            const progress = (currentQuestion / questions[currentLevel].length) * 100;
-            document.getElementById("progress-bar").style.width = progress + "%";
-        }
-
-        // 拖拽排序功能
-        let draggedItem = null;
-
-        function dragStart(event) {
-            draggedItem = event.target;
-            event.dataTransfer.setData("text/plain", event.target.textContent);
-            setTimeout(() => {
-                event.target.style.opacity = "0.5";
-            }, 0);
-        }
-
-        function dragOver(event) {
-            event.preventDefault();
-            event.dataTransfer.dropEffect = "move";
-        }
-
-        function drop(event) {
-            event.preventDefault();
-            const target = event.target;
-            if (target.classList.contains("sort-target")) {
-                const newItem = document.createElement("div");
-                newItem.className = "sort-item";
-                newItem.textContent = event.dataTransfer.getData("text/plain");
-                target.appendChild(newItem);
-                draggedItem.remove();
-                draggedItem = null;
-            }
-        }
-
-        // 检查排序答案
-        function checkSort() {
-            const target = document.getElementById("sort-target");
-            const items = target.querySelectorAll(".sort-item");
-            const correctOrder = ["口腔", "食道", "胃", "小肠", "大肠"];
-            let userOrder = [];
+        // 结束游戏（失败）
+        function endGame() {
+            clearInterval(timer);
+            gameScreen.classList.remove('active');
+            failureScreen.classList.add('active');
             
-            items.forEach(item => {
-                userOrder.push(item.textContent);
-            });
+            finalScoreFailureEl.textContent = score;
+            const accuracy = Math.round((score / (currentQuestions.length * 10)) * 100);
+            accuracyFailureEl.textContent = accuracy;
             
-            const feedback = document.getElementById("sort-feedback");
-            
-            if (JSON.stringify(userOrder) === JSON.stringify(correctOrder)) {
-                feedback.textContent = "排序正确！你掌握了食物的消化路线！";
-                feedback.className = "feedback correct";
-                // 加分
-                levelScores[2] += 25;
-                document.getElementById("sort-score").textContent = levelScores[2];
-                document.getElementById("sort-next-btn").style.display = "block";
+            // 根据得分给出评价
+            let comment = '';
+            if (accuracy >= 80) {
+                comment = '虽然失败了，但你的表现很不错！';
+            } else if (accuracy >= 60) {
+                comment = '还有提升空间，继续努力！';
             } else {
-                feedback.textContent = "排序错误！正确路线是：口腔 → 食道 → 胃 → 小肠 → 大肠";
-                feedback.className = "feedback incorrect";
+                comment = '需要多学习科学知识，下次会更好！';
             }
             
-            feedback.style.display = "block";
+            performanceCommentFailureEl.textContent = comment;
         }
 
-        // 实验选项选择
-        function toggleExperimentItem(item) {
-            item.classList.toggle("active");
-        }
-
-        // 检查实验答案
-        function checkExperiment() {
-            const activeItems = document.querySelectorAll(".experiment-item.active");
-            const correctItems = ["轮胎做花纹", "脚蹬表面做纹路", "刹车橡皮加粗"];
-            let correctCount = 0;
+        // 游戏成功完成
+        function endGameSuccess() {
+            clearInterval(timer);
+            gameScreen.classList.remove('active');
+            successScreen.classList.add('active');
             
-            activeItems.forEach(item => {
-                if (correctItems.includes(item.textContent)) {
-                    correctCount++;
-                }
-            });
+            finalScoreSuccessEl.textContent = score;
+            const accuracy = Math.round((score / (currentQuestions.length * 10)) * 100);
+            accuracySuccessEl.textContent = accuracy;
             
-            const feedback = document.getElementById("exp-feedback");
-            
-            if (correctCount === correctItems.length && activeItems.length === correctItems.length) {
-                feedback.textContent = "完全正确！这些做法都能增大摩擦力！";
-                feedback.className = "feedback correct";
-                // 加分
-                levelScores[3] += 25;
-                document.getElementById("exp-score").textContent = levelScores[3];
-                document.getElementById("exp-next-btn").style.display = "block";
-            } else if (correctCount > 0) {
-                feedback.textContent = "部分正确！正确答案是：轮胎做花纹、脚蹬表面做纹路、刹车橡皮加粗";
-                feedback.className = "feedback incorrect";
+            // 根据得分给出评价
+            let comment = '';
+            if (accuracy >= 95) {
+                comment = '太棒了！你是真正的科学小博士！';
+            } else if (accuracy >= 85) {
+                comment = '非常优秀！你对科学知识掌握得很好！';
+            } else if (accuracy >= 70) {
+                comment = '不错哦！你对科学知识掌握得很好！';
             } else {
-                feedback.textContent = "回答错误！正确答案是：轮胎做花纹、脚蹬表面做纹路、刹车橡皮加粗";
-                feedback.className = "feedback incorrect";
+                comment = '恭喜通关！继续努力，你会更棒的！';
             }
             
-            feedback.style.display = "block";
-        }
-
-        // 显示结果
-        function showResult() {
-            // 计算总分
-            totalScore = Object.values(levelScores).reduce((a, b) => a + b, 0);
-            
-            // 更新结果界面
-            document.getElementById("final-score").textContent = totalScore;
-            document.getElementById("level-results").innerHTML = "";
-            
-            // 添加关卡结果
-            const levelTitles = ["声音探秘", "身体小管家", "力与运动乐园"];
-            for (let i = 1; i <= 3; i++) {
-                const levelResult = document.createElement("div");
-                levelResult.style.margin = "10px 0";
-                levelResult.style.fontSize = "1.1rem";
-                levelResult.textContent = `${levelTitles[i-1]}：${levelScores[i]} 分`;
-                document.getElementById("level-results").appendChild(levelResult);
-            }
-            
-            // 设置勋章和标题
-            const medal = document.getElementById("medal");
-            const resultTitle = document.getElementById("result-title");
-            
-            if (totalScore === 300) {
-                medal.textContent = "🏅";
-                resultTitle.textContent = "恭喜你获得\"科学大师\"称号！";
-            } else if (totalScore >= 240) {
-                medal.textContent = "🥇";
-                resultTitle.textContent = "恭喜你获得\"科学小达人\"称号！";
-            } else if (totalScore >= 180) {
-                medal.textContent = "🥈";
-                resultTitle.textContent = "恭喜你获得\"科学探索者\"称号！";
-            } else {
-                medal.textContent = "🥉";
-                resultTitle.textContent = "恭喜你完成闯关！继续加油！";
-            }
-            
-            // 切换到结果界面
-            document.getElementById("quiz-screen").classList.remove("active");
-            document.getElementById("sort-screen").classList.remove("active");
-            document.getElementById("experiment-screen").classList.remove("active");
-            document.getElementById("result-screen").classList.add("active");
+            performanceCommentSuccessEl.textContent = comment;
         }
 
         // 重新开始游戏
         function restartGame() {
-            // 重置所有变量
-            currentLevel = 0;
             currentQuestion = 0;
-            totalScore = 0;
-            levelScores = {1: 0, 2: 0, 3: 0};
+            score = 0;
+            lives = 3;
+            selectedAnswer = -1;
+            streak = 0;
+            level = 1;
             
-            // 跳转到关卡选择
-            goToLevelSelect();
+            // 重置显示
+            streakEl.textContent = '0';
+            levelEl.textContent = '1';
+            
+            failureScreen.classList.remove('active');
+            successScreen.classList.remove('active');
+            welcomeScreen.classList.add('active');
         }
     </script>
 </body>
