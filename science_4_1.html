@@ -738,6 +738,67 @@
             align-items: center;
             width: 100%;
         }
+        
+        /* 错题集样式 */
+        .wrong-questions-container {
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        .wrong-question-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .wrong-question-title {
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .wrong-count {
+            display: inline-block;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        
+        .wrong-question-explanation {
+            color: #636e72;
+            font-size: 0.95em;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f0f3f5;
+            border-radius: 6px;
+        }
+        
+        .btn-practice-wrong {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            margin-top: 15px;
+        }
+        
+        .btn-practice-wrong:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+        }
+        
+        .no-wrong-questions {
+            text-align: center;
+            padding: 30px;
+            color: #00b894;
+            font-size: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -784,6 +845,7 @@
             </div>
             
             <button id="start-btn" class="btn">开始探险</button>
+            <button id="view-wrong-questions-main" class="btn" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">查看错题集</button>
         </div>
 
         <!-- 游戏中屏幕 -->
@@ -821,6 +883,10 @@
                     </div>
                 </div>
             </div>
+            
+            <button id="quit-game-btn" class="btn" style="background: linear-gradient(45deg, #6c5ce7, #a29bfe); margin-top: 15px;">
+                返回主菜单
+            </button>
         </div>
 
         <!-- 成功屏幕 -->
@@ -836,6 +902,8 @@
                 <p>🚀 获得下一级探险资格！</p>
             </div>
             <button id="play-again-success" class="btn">再来一次</button>
+            <button id="back-to-home-success" class="btn" style="background: linear-gradient(45deg, #6c5ce7, #a29bfe);">返回首页</button>
+            <button id="view-wrong-questions-success" class="btn btn-practice-wrong">查看错题集</button>
         </div>
 
         <!-- 失败屏幕 -->
@@ -851,6 +919,21 @@
                 <p>💪 不要气馁，科学探险需要坚持！</p>
             </div>
             <button id="play-again-failure" class="btn">重新挑战</button>
+            <button id="back-to-home-failure" class="btn" style="background: linear-gradient(45deg, #6c5ce7, #a29bfe);">返回首页</button>
+            <button id="view-wrong-questions-failure" class="btn btn-practice-wrong">查看错题集</button>
+        </div>
+        
+        <!-- 错题集屏幕 -->
+        <div id="wrong-questions-screen" class="screen">
+            <div class="character">📚</div>
+            <h2>📖 错题集</h2>
+            <p class="subtitle">查漏补缺，加强练习！</p>
+            <div id="wrong-questions-list" class="wrong-questions-container">
+                <!-- 错题列表将动态生成 -->
+            </div>
+            <button id="practice-wrong-questions" class="btn btn-practice-wrong" style="display:none;">练习错题</button>
+            <button id="clear-wrong-questions" class="btn" style="background: linear-gradient(45deg, #ff7675, #fab1a0); display:none;">清空错题集</button>
+            <button id="back-from-wrong-questions" class="btn" style="background: linear-gradient(45deg, #6c5ce7, #a29bfe);">返回首页</button>
         </div>
     </div>
 
@@ -1410,16 +1493,29 @@
         let timeLeft = 10; // 每题初始时间
         let level = 1; // 关卡数
         let totalQuestions = 20; // 默认题目数量
+        
+        // 错题集相关
+        let wrongQuestionsMap = new Map(); // 使用Map存储错题，key为题目内容，value为{question: 题目对象, count: 错误次数}
+        let isWrongQuestionMode = false; // 是否在错题练习模式
 
         // DOM元素
         const welcomeScreen = document.getElementById('welcome-screen');
         const gameScreen = document.getElementById('game-screen');
         const successScreen = document.getElementById('success-screen');
         const failureScreen = document.getElementById('failure-screen');
+        const wrongQuestionsScreen = document.getElementById('wrong-questions-screen');
         const startBtn = document.getElementById('start-btn');
         const nextBtn = document.getElementById('next-btn');
         const playAgainSuccessBtn = document.getElementById('play-again-success');
         const playAgainFailureBtn = document.getElementById('play-again-failure');
+        const backToHomeSuccessBtn = document.getElementById('back-to-home-success');
+        const backToHomeFailureBtn = document.getElementById('back-to-home-failure');
+        const viewWrongQuestionsSuccessBtn = document.getElementById('view-wrong-questions-success');
+        const viewWrongQuestionsFailureBtn = document.getElementById('view-wrong-questions-failure');
+        const practiceWrongQuestionsBtn = document.getElementById('practice-wrong-questions');
+        const clearWrongQuestionsBtn = document.getElementById('clear-wrong-questions');
+        const backFromWrongQuestionsBtn = document.getElementById('back-from-wrong-questions');
+        const wrongQuestionsList = document.getElementById('wrong-questions-list');
         const questionEl = document.getElementById('question');
         const optionsContainer = document.getElementById('options-container');
         const fillBlankInput = document.getElementById('fill-blank-input');
@@ -1449,13 +1545,28 @@
         // 弹窗相关元素
         const popupModal = document.getElementById('popup-modal');
         const popupNextBtn = document.getElementById('popup-next-btn');
+        
+        // 游戏中返回主菜单按钮
+        const quitGameBtn = document.getElementById('quit-game-btn');
+        
+        // 主菜单查看错题集按钮
+        const viewWrongQuestionsMainBtn = document.getElementById('view-wrong-questions-main');
 
         // 事件监听器
         startBtn.addEventListener('click', startGame);
         // nextBtn.addEventListener('click', nextQuestion);
         playAgainSuccessBtn.addEventListener('click', restartGame);
         playAgainFailureBtn.addEventListener('click', restartGame);
+        backToHomeSuccessBtn.addEventListener('click', backToHome);
+        backToHomeFailureBtn.addEventListener('click', backToHome);
+        viewWrongQuestionsSuccessBtn.addEventListener('click', showWrongQuestions);
+        viewWrongQuestionsFailureBtn.addEventListener('click', showWrongQuestions);
+        practiceWrongQuestionsBtn.addEventListener('click', startWrongQuestionPractice);
+        clearWrongQuestionsBtn.addEventListener('click', clearWrongQuestions);
+        backFromWrongQuestionsBtn.addEventListener('click', backToHome);
         popupNextBtn.addEventListener('click', nextQuestion);
+        quitGameBtn.addEventListener('click', quitGame);
+        viewWrongQuestionsMainBtn.addEventListener('click', showWrongQuestions);
         
         // 单元选择按钮事件
         unitBtns.forEach(btn => {
@@ -1493,24 +1604,49 @@
 
         // 开始游戏
         function startGame() {
-            // 根据选择的单元准备题目
+            // 准备基础题库
+            let baseQuestions = [];
             if (selectedUnit === 'all') {
-                // 合并所有单元的题目并随机打乱
-                currentQuestions = [...questions.sound, ...questions.breathing, ...questions.motion];
-                currentQuestions = shuffleArray([...currentQuestions]);
-                
-                // 根据游戏模式限制题目数量
-                if (currentQuestions.length > totalQuestions) {
-                    currentQuestions = currentQuestions.slice(0, totalQuestions);
-                }
+                // 合并所有单元的题目
+                baseQuestions = [...questions.sound, ...questions.breathing, ...questions.motion];
             } else {
-                currentQuestions = [...questions[selectedUnit]];
-                // 如果选择特定单元，根据模式调整题目数量
-                if (currentQuestions.length > totalQuestions) {
-                    currentQuestions = shuffleArray([...currentQuestions]).slice(0, totalQuestions);
-                } else {
-                    currentQuestions = shuffleArray([...currentQuestions]);
-                }
+                baseQuestions = [...questions[selectedUnit]];
+            }
+            
+            // 优先处理错题：按错误次数从高到低排序
+            let priorityQuestions = [];
+            let remainingQuestions = [];
+            
+            if (wrongQuestionsMap.size > 0) {
+                // 获取错题列表并按错误次数降序排序
+                const sortedWrongQuestions = Array.from(wrongQuestionsMap.entries())
+                    .sort((a, b) => b[1].count - a[1].count)
+                    .map(([key, value]) => value.question);
+                
+                // 过滤出在当前选择单元中的错题
+                sortedWrongQuestions.forEach(wrongQ => {
+                    const found = baseQuestions.find(q => q.question === wrongQ.question);
+                    if (found) {
+                        priorityQuestions.push(found);
+                    }
+                });
+                
+                // 剩余的题目（去除已在错题集中的题目）
+                remainingQuestions = baseQuestions.filter(q => {
+                    return !priorityQuestions.some(pq => pq.question === q.question);
+                });
+                remainingQuestions = shuffleArray(remainingQuestions);
+            } else {
+                // 如果没有错题，全部随机打乱
+                remainingQuestions = shuffleArray([...baseQuestions]);
+            }
+            
+            // 组合题目：优先错题 + 其余题目
+            currentQuestions = [...priorityQuestions, ...remainingQuestions];
+            
+            // 根据游戏模式限制题目数量
+            if (currentQuestions.length > totalQuestions) {
+                currentQuestions = currentQuestions.slice(0, totalQuestions);
             }
             
             // 根据游戏模式设置初始参数
@@ -1761,6 +1897,11 @@
             streak = 0;
             streakEl.textContent = streak;
             
+            // 记录错题（只在非错题练习模式下记录）
+            if (!isWrongQuestionMode) {
+                addToWrongQuestions(currentQuestions[currentQuestion]);
+            }
+            
             // 根据游戏模式处理生命值
             if (selectedMode !== 'timed') { // 计时模式不减生命值，而是直接结束游戏
                 lives--;
@@ -1986,12 +2127,16 @@
 
         // 重新开始游戏
         function restartGame() {
+            // 清除计时器
+            clearInterval(timer);
+            
             currentQuestion = 0;
             score = 0;
             lives = 3;
             selectedAnswer = -1;
             streak = 0;
             level = 1;
+            isWrongQuestionMode = false; // 重置错题练习模式
             
             // 重置显示
             streakEl.textContent = '0';
@@ -2000,6 +2145,16 @@
             failureScreen.classList.remove('active');
             successScreen.classList.remove('active');
             welcomeScreen.classList.add('active');
+            
+            // 重置单元选择为默认（全部领域）
+            unitBtns.forEach(btn => {
+                if(btn.dataset.unit === 'all') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            selectedUnit = 'all';
             
             // 重置模式选择为默认
             modeBtns.forEach(btn => {
@@ -2011,7 +2166,257 @@
             });
             selectedMode = 'normal';
             totalQuestions = 20;
+            
+            // 重置生命值显示
+            updateLivesDisplay();
         }
+        
+        // 返回首页功能
+        function backToHome() {
+            // 清除计时器
+            clearInterval(timer);
+            
+            currentQuestion = 0;
+            score = 0;
+            lives = 3;
+            selectedAnswer = -1;
+            streak = 0;
+            level = 1;
+            isWrongQuestionMode = false; // 重置错题练习模式
+            
+            // 重置显示
+            streakEl.textContent = '0';
+            levelEl.textContent = '1';
+            
+            // 隐藏成功/失败屏幕，显示欢迎屏幕
+            failureScreen.classList.remove('active');
+            successScreen.classList.remove('active');
+            wrongQuestionsScreen.classList.remove('active');
+            gameScreen.classList.remove('active');
+            welcomeScreen.classList.add('active');
+            
+            // 重置单元选择为默认（全部领域）
+            unitBtns.forEach(btn => {
+                if(btn.dataset.unit === 'all') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            selectedUnit = 'all';
+            
+            // 重置模式选择为默认（经典模式）
+            modeBtns.forEach(btn => {
+                if(btn.dataset.mode === 'normal') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            selectedMode = 'normal';
+            totalQuestions = 20;
+            
+            // 重置生命值显示
+            updateLivesDisplay();
+        }
+        
+        // 添加错题到错题集
+        function addToWrongQuestions(question) {
+            const questionKey = question.question; // 使用题目内容作为key
+            
+            if (wrongQuestionsMap.has(questionKey)) {
+                // 如果已存在，增加错误次数
+                const wrongItem = wrongQuestionsMap.get(questionKey);
+                wrongItem.count++;
+            } else {
+                // 如果不存在，添加新错题
+                wrongQuestionsMap.set(questionKey, {
+                    question: question,
+                    count: 1
+                });
+            }
+            
+            // 保存到localStorage
+            saveWrongQuestionsToStorage();
+        }
+        
+        // 保存错题集到localStorage
+        function saveWrongQuestionsToStorage() {
+            try {
+                const wrongQuestionsArray = Array.from(wrongQuestionsMap.entries());
+                localStorage.setItem('scienceWrongQuestions', JSON.stringify(wrongQuestionsArray));
+            } catch (e) {
+                console.error('保存错题集失败:', e);
+            }
+        }
+        
+        // 从lstorage加载错题集
+        function loadWrongQuestionsFromStorage() {
+            try {
+                const stored = localStorage.getItem('scienceWrongQuestions');
+                if (stored) {
+                    const wrongQuestionsArray = JSON.parse(stored);
+                    wrongQuestionsMap = new Map(wrongQuestionsArray);
+                }
+            } catch (e) {
+                console.error('加载错题集失败:', e);
+                wrongQuestionsMap = new Map();
+            }
+        }
+        
+        // 显示错题集
+        function showWrongQuestions() {
+            // 隐藏其他屏幕
+            successScreen.classList.remove('active');
+            failureScreen.classList.remove('active');
+            welcomeScreen.classList.remove('active');
+            gameScreen.classList.remove('active');
+            wrongQuestionsScreen.classList.add('active');
+            
+            // 清空列表
+            wrongQuestionsList.innerHTML = '';
+            
+            if (wrongQuestionsMap.size === 0) {
+                wrongQuestionsList.innerHTML = '<div class="no-wrong-questions">🎉 太棒了！暂无错题！</div>';
+                practiceWrongQuestionsBtn.style.display = 'none';
+                clearWrongQuestionsBtn.style.display = 'none';
+            } else {
+                // 将Map转换为数组并按错误次数排序
+                const sortedWrongQuestions = Array.from(wrongQuestionsMap.entries())
+                    .sort((a, b) => b[1].count - a[1].count);
+                
+                sortedWrongQuestions.forEach(([key, value]) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'wrong-question-item';
+                    
+                    const q = value.question;
+                    const count = value.count;
+                    
+                    let answerText = '';
+                    if (q.type === 'multiple-choice') {
+                        answerText = q.options[q.correct];
+                    } else {
+                        answerText = q.correct;
+                    }
+                    
+                    itemDiv.innerHTML = `
+                        <div class="wrong-question-title">
+                            ${q.question}
+                            <span class="wrong-count">错误 ${count} 次</span>
+                        </div>
+                        <div style="color: #00b894; margin: 5px 0;">
+                            <strong>✔️ 正确答案：</strong>${answerText}
+                        </div>
+                        <div class="wrong-question-explanation">
+                            <strong>💡 解析：</strong>${q.explanation}
+                        </div>
+                    `;
+                    
+                    wrongQuestionsList.appendChild(itemDiv);
+                });
+                
+                practiceWrongQuestionsBtn.style.display = 'block';
+                clearWrongQuestionsBtn.style.display = 'block';
+            }
+        }
+        
+        // 开始错题练习
+        function startWrongQuestionPractice() {
+            if (wrongQuestionsMap.size === 0) {
+                alert('没有错题可以练习！');
+                return;
+            }
+            
+            // 设置为错题练习模式
+            isWrongQuestionMode = true;
+            
+            // 准备错题列表
+            currentQuestions = Array.from(wrongQuestionsMap.values())
+                .map(item => item.question);
+            currentQuestions = shuffleArray(currentQuestions);
+            
+            // 重置游戏状态
+            currentQuestion = 0;
+            score = 0;
+            lives = 3;
+            streak = 0;
+            level = 1;
+            
+            // 错题练习模式使用默认设置
+            timeLeft = 10;
+            selectedMode = 'normal';
+            
+            // 更新生命值显示
+            updateLivesDisplay();
+            
+            // 显示游戏屏幕
+            wrongQuestionsScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            
+            // 开始第一题
+            showQuestion();
+        }
+        
+        // 清空错题集
+        function clearWrongQuestions() {
+            if (confirm('确定要清空所有错题吗？')) {
+                wrongQuestionsMap.clear();
+                saveWrongQuestionsToStorage();
+                showWrongQuestions(); // 刷新显示
+            }
+        }
+        
+        // 退出游戏并返回主菜单
+        function quitGame() {
+            if (confirm('确定要退出当前游戏并返回主菜单吗？')) {
+                // 清除计时器
+                clearInterval(timer);
+                
+                // 重置游戏状态
+                currentQuestion = 0;
+                score = 0;
+                lives = 3;
+                selectedAnswer = -1;
+                streak = 0;
+                level = 1;
+                isWrongQuestionMode = false; // 重置错题练习模式
+                
+                // 重置显示
+                streakEl.textContent = '0';
+                levelEl.textContent = '1';
+                
+                // 隐藏游戏屏幕，显示欢迎屏幕
+                gameScreen.classList.remove('active');
+                welcomeScreen.classList.add('active');
+                
+                // 重置单元选择为默认（全部领域）
+                unitBtns.forEach(btn => {
+                    if(btn.dataset.unit === 'all') {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                selectedUnit = 'all';
+                
+                // 重置模式选择为默认（经典模式）
+                modeBtns.forEach(btn => {
+                    if(btn.dataset.mode === 'normal') {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                selectedMode = 'normal';
+                totalQuestions = 20;
+                
+                // 重置生命值显示
+                updateLivesDisplay();
+            }
+        }
+        
+        // 页面加载时加载错题集
+        loadWrongQuestionsFromStorage();
     </script>
 </body>
 </html>
